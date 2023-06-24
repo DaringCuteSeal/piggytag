@@ -10,6 +10,9 @@ pub mod structs;
 /** Default string shown when a value is unknown */
 const DEFAULT_UNKNOWN_VAL_STR: &str = "unknown";
 
+/** Default separator */
+const DEFAULT_SEPARATOR: &str = "----";
+
 /** Get a human-readable key-value pair */
 pub fn get_formatted_key_val<T: AsRef<str>, S: ToString>(
     key: T,
@@ -48,4 +51,9 @@ pub fn get_tagged_file<T: AsRef<Path>>(filename: T) -> Result<TaggedFile, Piggyt
 /** Print information */
 pub fn prnt_info<S: AsRef<str>>(string: S) {
     println!("{} {}", "[info]".bold(), string.as_ref())
+}
+
+/** Separator */
+pub fn prnt_sep() {
+    println!("{}\n", DEFAULT_SEPARATOR.bold());
 }

@@ -1,20 +1,54 @@
-use clap::{arg, Parser, Subcommand};
+use clap::{Parser, Subcommand};
+
+#[derive(Debug, Parser)]
+#[command(about="Show arguments", long_about=None)]
+pub struct ShowArgs {
+    /** Audio file name */
+    #[arg(required = true)]
+    pub filename: Vec<String>,
+
+    /** Tag to operate on */
+    #[clap(short = 'n', default_value_t = 1, global = true)]
+    pub tag_idx: usize,
+}
+
+#[derive(Debug, Parser)]
+#[command(about="Edit arguments", long_about=None)]
+pub struct EditArgs {
+    /** Audio file name */
+    #[arg(required = true)]
+    pub filename: Vec<String>,
+
+    /** Tag to operate on */
+    #[clap(short = 'n', default_value_t = 1, global = true)]
+    pub tag_idx: usize,
+}
+
+#[derive(Debug, Parser)]
+#[command(about="List arguments", long_about=None)]
+pub struct ListArgs {
+    /** Audio file name */
+    #[arg(required = true)]
+    pub filename: Vec<String>,
+}
 
 #[derive(Debug, Subcommand)]
-#[command(about="Piggytag subcommand", long_about = None)]
+#[command(about="Piggytag subcommands", long_about=None)]
 pub enum PiggytagSubcommand {
-    Show,
-    Edit,
+    /** Display main tag information */
+    Show(ShowArgs),
+
+    /** Edit tag */
+    Edit(EditArgs),
+
+    /** List available tags */
+    List(ListArgs),
 }
 
 #[derive(Parser, Debug)]
 #[command(author, version=env!("CARGO_PKG_VERSION"), about="A CLI audio metadata editor", long_about = None)]
 pub struct Args {
     /** Piggytag subcommand */
-    #[command(subcommand)]
+    #[clap(subcommand)]
     pub subcommand: PiggytagSubcommand,
-
-    /** Audio file name */
-    #[arg()]
-    pub filename: String,
 }

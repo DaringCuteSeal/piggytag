@@ -62,6 +62,7 @@ impl AudioMetadata {
     pub fn parse_from_tagged_file<P: AsRef<Path>>(
         filename: P,
         tagged_file: TaggedFile,
+        idx: usize,
     ) -> Option<Self> {
         let file_name_print = filename
             .as_ref()
@@ -69,10 +70,11 @@ impl AudioMetadata {
             .unwrap()
             .to_str()
             .map(|x| x.to_owned());
-        let tag = match tagged_file.primary_tag() {
-            Some(tag) => tag,
-            None => return None,
-        };
+        let tags = tagged_file.tags();
+        if tags.is_empty() {
+            return None;
+        }
+        let tag = tags[idx].clone();
         Some(AudioMetadata {
             // We have to clone some tag.method() results because they return Option<Cow<'_, str>> and we need Option<String>
             filename: file_name_print,
