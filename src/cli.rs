@@ -35,13 +35,13 @@ pub struct ListArgs {
 #[derive(Debug, Subcommand)]
 #[command(about="Piggytag subcommands", long_about=None)]
 pub enum PiggytagSubcommand {
-    /** Display main tag information */
+    /** Show tag(s) information */
     Show(ShowArgs),
 
-    /** Edit tag */
+    /** Edit tag(s) */
     Edit(EditArgs),
 
-    /** List available tags */
+    /** List available tag(s) */
     List(ListArgs),
 }
 

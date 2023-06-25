@@ -1,8 +1,9 @@
-use std::{fs::File, path::Path};
+use std::path::Path;
 
+use clap::builder::OsStr;
 use colored::{Color, Colorize};
 use error::PiggytagError;
-use lofty::{read_from, Probe, TaggedFile};
+use lofty::{Probe, TaggedFile};
 
 pub mod error;
 pub mod structs;
@@ -34,15 +35,48 @@ pub fn get_formatted_key_val<T: AsRef<str>, S: ToString>(
 
 /** Get audio tag */
 pub fn get_tagged_file<T: AsRef<Path>>(filename: T) -> Result<TaggedFile, PiggytagError> {
+    let file_path_parsed = Path::new(filename.as_ref());
+    let tmp_os_str = OsStr::from("unknown");
+    let _file_path_name = file_path_parsed
+        .file_name()
+        .unwrap_or(&tmp_os_str)
+        .to_str()
+        .unwrap_or("unknown");
+
     let result = match Probe::open(filename.as_ref()) {
         Ok(res) => res,
-        Err(err) => return Err(PiggytagError::LoftyError(err)),
+        Err(err) => {
+            let file_path_parsed = Path::new(filename.as_ref());
+            let tmp_os_str = OsStr::from("unknown");
+            let file_path_name = file_path_parsed
+                .file_name()
+                .unwrap_or(&tmp_os_str)
+                .to_str()
+                .unwrap_or("unknown");
+            return Err(PiggytagError::LoftyError {
+                file_name: file_path_name.to_owned(),
+                err,
+            });
+        }
     };
 
     match result.guess_file_type() {
         Ok(result) => match result.read() {
             Ok(file) => Ok(file),
-            Err(err) => Err(PiggytagError::LoftyError(err)),
+            Err(err) => {
+                let file_path_parsed = Path::new(filename.as_ref());
+                let tmp_os_str = OsStr::from("unknown");
+                let file_path_name = file_path_parsed
+                    .file_name()
+                    .unwrap_or(&tmp_os_str)
+                    .to_str()
+                    .unwrap_or("unknown");
+
+                Err(PiggytagError::LoftyError {
+                    file_name: file_path_name.to_owned(),
+                    err,
+                })
+            }
         },
         Err(err) => Err(PiggytagError::Io(err)),
     }

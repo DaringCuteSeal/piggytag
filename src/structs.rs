@@ -1,7 +1,7 @@
-use std::{borrow::Cow, fmt::Display, path::Path};
+use std::{fmt::Display, path::Path};
 
 use colored::Color;
-use lofty::{Accessor, Tag, TagExt, TaggedFile, TaggedFileExt};
+use lofty::{Accessor, TaggedFile, TaggedFileExt};
 
 use crate::get_formatted_key_val;
 
@@ -74,9 +74,12 @@ impl AudioMetadata {
         if tags.is_empty() {
             return None;
         }
+        if idx >= tags.len() {
+            return None;
+        }
         let tag = tags[idx].clone();
         Some(AudioMetadata {
-            // We have to clone some tag.method() results because they return Option<Cow<'_, str>> and we need Option<String>
+            // We have to clone some tag.method() results because they return Cow<'_, str> and we need String
             filename: file_name_print,
             title: tag.title().map(|x| x.as_ref().to_owned()),
             artist: tag.artist().map(|x| x.as_ref().to_owned()),

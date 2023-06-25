@@ -7,8 +7,11 @@ pub enum PiggytagError {
     #[error(transparent)]
     Io(#[from] ::std::io::Error),
 
-    #[error(transparent)]
-    LoftyError(#[from] ::lofty::error::LoftyError),
+    #[error("error on file {file_name}: {err}")]
+    LoftyError {
+        file_name: String,
+        err: ::lofty::error::LoftyError,
+    },
 
     #[error("{0}")]
     Msg(String),
@@ -36,8 +39,15 @@ pub fn error_handler(error: PiggytagError, out: &mut dyn Write) -> ! {
                 std::process::exit(1)
             }
         }
-        PiggytagError::LoftyError(err) => {
-            writeln!(out, "{} {}", "[error]".red(), err).ok();
+        PiggytagError::LoftyError { file_name, err } => {
+            writeln!(
+                out,
+                "{} on file {}: {}",
+                "[error]".red(),
+                file_name.bold(),
+                err
+            )
+            .ok();
             std::process::exit(1)
         }
         _ => {
