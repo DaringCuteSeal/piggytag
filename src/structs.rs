@@ -1,19 +1,19 @@
 use std::{fmt::Display, path::Path};
 
 use colored::Color;
-use lofty::{Accessor, TaggedFile, TaggedFileExt};
+use lofty::{Accessor, Tag, TaggedFile, TaggedFileExt};
 
 use crate::get_formatted_key_val;
 
 pub struct AudioMetadata {
-    filename: Option<String>,
-    title: Option<String>,
-    artist: Option<String>,
-    album: Option<String>,
-    track: Option<u32>,
-    year: Option<u32>,
-    comment: Option<String>,
-    genre: Option<String>,
+    pub filename: Option<String>,
+    pub title: Option<String>,
+    pub artist: Option<String>,
+    pub album: Option<String>,
+    pub track: Option<u32>,
+    pub year: Option<u32>,
+    pub comment: Option<String>,
+    pub genre: Option<String>,
 }
 
 impl Display for AudioMetadata {
@@ -59,9 +59,10 @@ impl Display for AudioMetadata {
 }
 
 impl AudioMetadata {
+    /** Parse `AudioMetadata` from tag number `idx` from given file. Returns `None` if tag from given index is not available. */
     pub fn parse_from_tagged_file<P: AsRef<Path>>(
         filename: P,
-        tagged_file: TaggedFile,
+        tagged_file: &TaggedFile,
         idx: usize,
     ) -> Option<Self> {
         let file_name_print = filename
@@ -71,10 +72,7 @@ impl AudioMetadata {
             .to_str()
             .map(|x| x.to_owned());
         let tags = tagged_file.tags();
-        if tags.is_empty() {
-            return None;
-        }
-        if idx >= tags.len() {
+        if tags.is_empty() || idx >= tags.len() {
             return None;
         }
         let tag = tags[idx].clone();
@@ -89,5 +87,36 @@ impl AudioMetadata {
             comment: tag.comment().map(|x| x.as_ref().to_owned()),
             genre: tag.genre().map(|x| x.as_ref().to_owned()),
         })
+    }
+
+    /** Mutate tag in-place based on information from `self`. If given `tag_idx` is `None`, a new  */
+    pub fn mutate_tag(&self, tag: &mut Tag) {
+        if let Some(artist) = &self.artist {
+            tag.set_artist(artist.clone());
+        }
+
+        if let Some(album) = &self.album {
+            tag.set_album(album.clone());
+        }
+
+        if let Some(title) = &self.title {
+            tag.set_title(title.clone());
+        }
+
+        if let Some(track) = self.track {
+            tag.set_track(track);
+        }
+
+        if let Some(year) = self.year {
+            tag.set_year(year);
+        }
+
+        if let Some(comment) = &self.comment {
+            tag.set_comment(comment.clone());
+        }
+
+        if let Some(genre) = &self.genre {
+            tag.set_genre(genre.clone());
+        }
     }
 }

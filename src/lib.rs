@@ -33,7 +33,7 @@ pub fn get_formatted_key_val<T: AsRef<str>, S: ToString>(
     format!("{} {}\n", key_print.bold(), val_print)
 }
 
-/** Get audio tag */
+/** Get `TaggedFile` from a file */
 pub fn get_tagged_file<T: AsRef<Path>>(filename: T) -> Result<TaggedFile, PiggytagError> {
     let file_path_parsed = Path::new(filename.as_ref());
     let tmp_os_str = OsStr::from("unknown");
