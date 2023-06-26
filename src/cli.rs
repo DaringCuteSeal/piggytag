@@ -7,7 +7,7 @@ pub struct ShowArgs {
     #[arg(required = true)]
     pub filename: Vec<String>,
 
-    /** Tag to operate on */
+    /** Tag index to operate on (starts from 1) */
     #[clap(short = 'n', default_value_t = 1)]
     pub tag_idx: usize,
 }
@@ -23,7 +23,7 @@ pub struct EditArgs {
     #[arg(short = 'c', long = "create")]
     pub new_tag: bool,
 
-    /** Tag to operate on */
+    /** Tag index to operate on (starts from 1) */
     #[arg(short = 'n', default_value_t = 1)]
     pub tag_idx: usize,
 
@@ -52,7 +52,7 @@ pub struct EditArgs {
     pub comment: Option<String>,
 
     /** Set audio genre */
-    #[arg(long = "comment")]
+    #[arg(long = "genre")]
     pub genre: Option<String>,
 }
 

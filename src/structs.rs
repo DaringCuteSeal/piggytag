@@ -89,7 +89,7 @@ impl AudioMetadata {
         })
     }
 
-    /** Mutate tag in-place based on information from `self`. If given `tag_idx` is `None`, a new  */
+    /** Mutate tag in-place based on information from `self`. */
     pub fn mutate_tag(&self, tag: &mut Tag) {
         if let Some(artist) = &self.artist {
             tag.set_artist(artist.clone());

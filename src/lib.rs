@@ -87,7 +87,7 @@ pub fn prnt_info<S: AsRef<str>>(string: S) {
     println!("{} {}", "[info]".bold(), string.as_ref())
 }
 
-/** Separator */
+/** Print a separator */
 pub fn prnt_sep() {
     println!("{}\n", DEFAULT_SEPARATOR.bold());
 }

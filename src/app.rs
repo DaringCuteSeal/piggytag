@@ -1,4 +1,4 @@
-use std::{fs::File, io::stdout, path::Path};
+use std::{io::stdout, path::Path};
 
 use clap::builder::OsStr;
 use colored::Colorize;
@@ -59,19 +59,26 @@ impl PiggytagCmd for CLIApp {
                     };
                     if args.new_tag {
                         let mut tag = Tag::new(lofty::TagType::Id3v2);
-                        CLIApp::mutate_tag(filename, &metadata, &mut tag)
+                        metadata.mutate_tag(&mut tag);
+                        tag.save_to_path(filename).unwrap();
+                        // CLIApp::mutate_tag(filename, &metadata, &mut tag)
                     } else {
                         let tagged_file = match get_tagged_file(filename) {
                             Ok(tagged_file) => tagged_file,
                             Err(err) => error_handler(err, &mut stdout()),
                         };
                         let tags = tagged_file.tags();
-                        if tags.len() > 
-                        let mut tag = tagged_file.tags()[args.tag_idx].to_owned();
+                        if tags.len() < args.tag_idx {
+                            error_handler(
+                                PiggytagError::from("tag with given index cannot be found"),
+                                &mut stdout(),
+                            );
+                        };
+                        let mut tag = tags[args.tag_idx - 1].to_owned();
+
                         CLIApp::mutate_tag(filename, &metadata, &mut tag)
                     }
                 }
-                todo!();
             }
         }
     }
@@ -140,12 +147,8 @@ impl PiggytagCmd for CLIApp {
             .unwrap_or("unknown");
 
         metadata.mutate_tag(tag);
-        let mut opened_file = match File::open(file_path_parsed) {
-            Ok(file) => file,
-            Err(err) => error_handler(PiggytagError::Io(err), &mut stdout()),
-        };
-        match tag.save_to(&mut opened_file) {
-            Ok(_) => {}
+        match tag.save_to_path(file_path.as_ref()) {
+            Ok(_) => prnt_info(format!("edited tag from {}", file_path_name.bold())),
             Err(err) => error_handler(
                 PiggytagError::LoftyError {
                     file_name: (file_path_name.to_owned()),
